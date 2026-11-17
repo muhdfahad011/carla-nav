@@ -36,7 +36,7 @@ kubectl apply -f k8s/job.yaml
 ```
 
 ## Reward hacking: what I defended against
-My earlier project (RLAutoNav) rewarded speed, which an agent can farm by driving fast in circles.
+A common mistake in driving rewards is paying for speed, which an agent can farm by driving fast in circles.
 Here the reward and the grader are separate, and every verifier check maps to a concrete exploit:
 
 | Exploit | Defence | Test |
