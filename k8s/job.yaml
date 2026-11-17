@@ -1,0 +1,30 @@
+# Parallel rollouts: 8 shards, 4 at a time. Each pod gets JOB_COMPLETION_INDEX -> different task seeds.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rlnav-eval
+spec:
+  completions: 8
+  parallelism: 4
+  completionMode: Indexed
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: eval
+          image: rlnav:latest            # docker build -t rlnav:latest .
+          args: ["--policy", "llm", "--episodes", "25", "--workers", "4"]
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef: { name: anthropic, key: api-key }
+            # For real CARLA, add a CARLA server Deployment/Service and set:
+            # - { name: CARLA_HOST, value: carla-server }
+          resources:
+            requests: { cpu: "500m", memory: "512Mi" }
+            limits: { cpu: "1", memory: "1Gi" }
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
